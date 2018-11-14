@@ -7,7 +7,7 @@ var PULSE_FREQ = 10;
  */
 function Pulse(x, y) {
   // Speed in pixels/frame
-  this.SPEED = 10;
+  this.SPEED = 20
   this.pos = createVector(x, y);
   this.dist = 0;
   
@@ -17,7 +17,7 @@ function Pulse(x, y) {
   
   this.draw = function() {
     noFill();
-    stroke(200);
+    stroke(255);
     ellipse(this.pos.x, this.pos.y, this.dist, this.dist);
   }
 }
@@ -41,10 +41,16 @@ function BluetoothTag(pos) {
   }
 }
 
+var POOL_START = 0.1;
+var POOL_END = 0.9;
+var POOL_LENGTH = POOL_END - POOL_START;
+var POOL_WIDTH = 0.2;
+
 function move_curve(t) {
+  var OFFSET = 0.04;
   var freq = 0.01;
-  var min_x = 50;
-  var max_x = width - 50;
+  var min_x = (POOL_START + OFFSET) * width;
+  var max_x = (POOL_END - OFFSET) * width;
   var center = (min_x + max_x) / 2;
   var amplitude = (max_x - min_x) / 2;
   var x_wave = center + amplitude * -cos(freq * t);
@@ -63,6 +69,11 @@ function setup() {
 
 function draw() {
   background(64);
+  
+  // Draw a rectangle for the pool
+  fill(0, 128, 200);
+  stroke(0);
+  rect(POOL_START * width, height / 2 - POOL_WIDTH * height/ 2, POOL_LENGTH * width, POOL_WIDTH * height);
   
   tag.draw();
   
