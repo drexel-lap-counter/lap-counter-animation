@@ -66,6 +66,16 @@ function Phone() {
   this.w = 0.02;
   this.threshold = 285;
   
+  this.update_threshold = function(mouse_x, mouse_y) {
+    var x = this.pos.x * width;
+    var y = this.pos.y * height;
+    var pos_px = createVector(x, y);
+    var mouse_pos = createVector(mouse_x, mouse_y);
+    var dist = p5.Vector.sub(mouse_pos, pos_px).mag();
+    this.threshold = dist;
+    console.log(dist);
+  }
+  
   this.draw = function() {
     push();
     // Center the coordinates on the center of the phone
@@ -87,7 +97,7 @@ function Phone() {
     
     // Draw the threshold in red
     stroke(255, 0, 0);
-    ellipse(0, 0, this.threshold);
+    ellipse(0, 0, 2 * this.threshold, 2 * this.threshold);
     
     pop();
   }
@@ -135,6 +145,11 @@ function draw() {
   
   // Draw the phone
   phone.draw();
+  
+  // if the mouse is pressed, update the threshold:
+  if (mouseIsPressed) {
+    phone.update_threshold(mouseX, mouseY);
+  }
   
   var next_pos = move_curve(frameCount);
   var dist = next_pos.x - POOL_START * width;
