@@ -1,23 +1,34 @@
 var NUM_PULSES = 1000;
 var PULSE_FREQ = 10;
 
+var MAX_COLOR = 255;
+var BG_COLOR = 64;
+
 /**
  * In order to use P5.js mode in Processing IDE, you need
  * to stick to pre-ES6 Javascript :/
  */
 function Pulse(x, y) {
   // Speed in pixels/frame
-  this.SPEED = 20
+  this.SPEED = 25;
   this.pos = createVector(x, y);
   this.dist = 0;
+  this.steps = 0;
+  this.MAX_STEPS = 50;
   
   this.spread = function() {
     this.dist += this.SPEED;
+    this.steps++;
   }
   
   this.draw = function() {
+    if (this.steps > this.MAX_STEPS)
+      return;
+
+    // Fade out over time
+    var alpha = MAX_COLOR - MAX_COLOR * this.steps / this.MAX_STEPS;
     noFill();
-    stroke(255);
+    stroke(MAX_COLOR, alpha);
     ellipse(this.pos.x, this.pos.y, this.dist, this.dist);
   }
 }
