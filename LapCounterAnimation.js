@@ -110,14 +110,17 @@ function Phone() {
     rect(-0.5 * this.w * width, -this.w * width, this.w * width, 2 * this.w * width);
     
     // Draw distance ranges every 100 px
+    /*
     noFill();
     stroke(255, 255, 0, 128);
     for (var i = 0; i < this.NUM_LINES; i++) {
       var radius = i * this.RADIUS_STEP;
       ellipse(0, 0, radius, radius);
     }
+    */
     
     // Draw the threshold in red
+    noFill();
     stroke(255, 0, 0);
     ellipse(0, 0, 2 * this.threshold, 2 * this.threshold);
     
@@ -186,9 +189,16 @@ function draw() {
   
   var laps = 0;
   
+  // The pool at drexel is 75 ft long
+  // This is a scaling factor in ft/px.
+  var scale_factor = 75.0 / (POOL_LENGTH * width);
+  var dist = phone.last_tag_dist * scale_factor;
+  var threshold_dist = phone.threshold * scale_factor;
+  
   noStroke();
   fill(255);
   textSize(32);
-  text("Distance: " + phone.last_tag_dist.toFixed(0) + " px", 20, 32);
-  text("Laps: " + phone.lap_count, 20, 64);
+  text("Distance: " + dist.toFixed(0) + " ft", 20, 32);
+  text("Threshold: " + threshold_dist.toFixed(1) + " ft", 20, 64);
+  text("Laps: " + phone.lap_count, 20, 96);
 }
