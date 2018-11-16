@@ -1,6 +1,13 @@
 var NUM_PULSES = 1000;
 var PULSE_FREQ = 10;
 
+
+// Pool dimensions measured as a fraction of the screen dimensions
+var POOL_START = 0.1;
+var POOL_END = 0.9;
+var POOL_LENGTH = POOL_END - POOL_START;
+var POOL_WIDTH = 0.2;
+
 var MAX_COLOR = 255;
 var BG_COLOR = 64;
 
@@ -52,10 +59,40 @@ function BluetoothTag(pos) {
   }
 }
 
-var POOL_START = 0.1;
-var POOL_END = 0.9;
-var POOL_LENGTH = POOL_END - POOL_START;
-var POOL_WIDTH = 0.2;
+function Phone() {
+  this.pos = createVector(0.05, 0.5);
+  this.RADIUS_STEP = 200;
+  this.NUM_LINES = 10;
+  this.w = 0.02;
+  this.threshold = 285;
+  
+  this.draw = function() {
+    push();
+    // Center the coordinates on the center of the phone
+    translate(this.pos.x * width, this.pos.y * height);
+    
+    // Draw a small rectangle for the smartphone
+    var half_size = this.w / 2;
+    stroke(0);
+    fill(200);
+    rect(-0.5 * this.w * width, -this.w * width, this.w * width, 2 * this.w * width);
+    
+    // Draw distance ranges every 100 px
+    noFill();
+    stroke(255, 255, 0, 128);
+    for (var i = 0; i < this.NUM_LINES; i++) {
+      var radius = i * this.RADIUS_STEP;
+      ellipse(0, 0, radius, radius);
+    }
+    
+    // Draw the threshold in red
+    stroke(255, 0, 0);
+    ellipse(0, 0, this.threshold);
+    
+    pop();
+  }
+}
+
 
 function move_curve(t) {
   var OFFSET = 0.04;
@@ -71,11 +108,13 @@ function move_curve(t) {
 
 var pulses = [];
 var tag;
+var phone;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   
   tag = new BluetoothTag(move_curve(0));
+  phone = new Phone();
 }
 
 function draw() {
@@ -94,6 +133,12 @@ function draw() {
     pulses[i].draw();
   }
   
+  // Draw the phone
+  phone.draw();
+  
+  var next_pos = move_curve(frameCount);
+  var dist = next_pos.x - POOL_START * width;
+  
   tag.move(move_curve(frameCount));
    
   if (frameCount % PULSE_FREQ == 0) {
@@ -101,4 +146,12 @@ function draw() {
     if (pulses.length > NUM_PULSES)
       pulses.shift();
   }
+  
+  var laps = 0;
+  
+  noStroke();
+  fill(255);
+  textSize(32);
+  text("Distance: " + dist.toFixed(0) + " px", 20, 32);
+  text("Laps: " + laps, 20, 64);
 }
