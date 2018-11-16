@@ -66,14 +66,36 @@ function Phone() {
   this.w = 0.02;
   this.threshold = 285;
   
-  this.update_threshold = function(mouse_x, mouse_y) {
+  this.state = "near";
+  this.last_tag_dist = 0;
+  this.lap_count = 0;
+  
+  this.pos_px = function() {
     var x = this.pos.x * width;
     var y = this.pos.y * height;
-    var pos_px = createVector(x, y);
+    return createVector(x, y);
+  }
+  
+  this.update_threshold = function(mouse_x, mouse_y) {
     var mouse_pos = createVector(mouse_x, mouse_y);
-    var dist = p5.Vector.sub(mouse_pos, pos_px).mag();
+    var dist = p5.Vector.sub(mouse_pos, this.pos_px()).mag();
     this.threshold = dist;
     console.log(dist);
+  }
+  
+  this.update_lap_count = function(tag_pos) {
+    var dist = p5.Vector.sub(tag_pos, this.pos_px()).mag();
+    
+    // If the swimmer returns to within the threshold,
+    // increment the lap count
+    if (this.state === "near" && dist > this.threshold) {
+      this.state = "far";
+    } else if (this.state === "far" && dist <= this.threshold) {
+      this.state = "near";
+      this.lap_count++;
+    }
+      
+    this.last_tag_dist = dist;
   }
   
   this.draw = function() {
@@ -106,7 +128,7 @@ function Phone() {
 
 function move_curve(t) {
   var OFFSET = 0.04;
-  var freq = 0.01;
+  var freq = 0.015;
   var min_x = (POOL_START + OFFSET) * width;
   var max_x = (POOL_END - OFFSET) * width;
   var center = (min_x + max_x) / 2;
@@ -152,9 +174,9 @@ function draw() {
   }
   
   var next_pos = move_curve(frameCount);
-  var dist = next_pos.x - POOL_START * width;
-  
   tag.move(move_curve(frameCount));
+  
+  phone.update_lap_count(next_pos);
    
   if (frameCount % PULSE_FREQ == 0) {
     pulses.push(tag.pulse());
@@ -167,6 +189,6 @@ function draw() {
   noStroke();
   fill(255);
   textSize(32);
-  text("Distance: " + dist.toFixed(0) + " px", 20, 32);
-  text("Laps: " + laps, 20, 64);
+  text("Distance: " + phone.last_tag_dist.toFixed(0) + " px", 20, 32);
+  text("Laps: " + phone.lap_count, 20, 64);
 }
