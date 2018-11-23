@@ -92,7 +92,7 @@ function Phone() {
       this.state = "far";
     } else if (this.state === "far" && dist <= this.threshold) {
       this.state = "near";
-      this.lap_count++;
+      this.lap_count += 2;
     }
       
     this.last_tag_dist = dist;
